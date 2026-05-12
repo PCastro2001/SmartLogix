@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  ms-inventario:
+    build: ./ms-inventario
+    ports:
+      - "8081:8081"
+
+  ms-pedidos:
+    build: ./ms-pedidos
+    ports:
+      - "8082:8082"
+    environment:
+      - INVENTARIO_URL=http://ms-inventario:8081
+    depends_on:
+      - ms-inventario
+
+  bff-service:
+    build: ./bff-service
+    ports:
+      - "8080:8080"
+    environment:
+      - INVENTARIO_URL=http://ms-inventario:8081
+      - PEDIDOS_URL=http://ms-pedidos:8082
+    depends_on:
+      - ms-inventario
+      - ms-pedidos
