@@ -1,5 +1,6 @@
 package com.smartlogix.ms_pedidos;
 
+import com.smartlogix.ms_pedidos.dto.ProductoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,5 +11,5 @@ public interface InventarioClient {
     
     // Este método es una simulación por ahora para que el Test 4 pase.
     @GetMapping("/productos/{id}")
-    Object obtenerProducto(@PathVariable("id") Long id);
+    ProductoDTO obtenerProducto(@PathVariable("id") Long id);
 }
