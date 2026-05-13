@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class ProductoDTO {
     private Long id;
     private String nombre;
+    @com.fasterxml.jackson.annotation.JsonProperty("precio")
     private Double precioUnitario;
     private Integer stock;
 }

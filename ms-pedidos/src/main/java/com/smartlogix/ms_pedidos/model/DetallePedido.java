@@ -17,6 +17,7 @@ public class DetallePedido {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private Pedido pedido;
     
     private Long productoId;
