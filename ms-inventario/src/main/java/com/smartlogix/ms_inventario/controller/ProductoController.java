@@ -23,6 +23,11 @@ public class ProductoController {
         return service.listarTodos();
     }
 
+    @GetMapping("/bajo-stock")
+    public List<Producto> listarBajoStock() {
+        return service.listarBajoStock();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(service.obtenerPorId(id));

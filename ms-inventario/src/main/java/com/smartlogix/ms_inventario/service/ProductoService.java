@@ -19,6 +19,15 @@ public class ProductoService {
         return repo.findAll();
     }
 
+    public List<Producto> listarBajoStock() {
+        // Obtenemos todos los productos y filtramos por stock <= stockMinimo
+        // O podríamos usar el método del repo si tuviéramos un valor fijo, 
+        // pero el stockMinimo es por producto.
+        return repo.findAll().stream()
+                .filter(p -> p.getStock() <= p.getStockMinimo())
+                .toList();
+    }
+
     public Producto obtenerPorId(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
