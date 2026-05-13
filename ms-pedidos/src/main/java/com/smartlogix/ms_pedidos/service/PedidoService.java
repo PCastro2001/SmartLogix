@@ -76,4 +76,25 @@ public class PedidoService {
         pedido.setEstado(nuevoEstado);
         return pedidoRepository.save(pedido);
     }
+
+    @Transactional(readOnly = true)
+    public List<Pedido> listarTodos() {
+        return pedidoRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Pedido obtenerPorId(Long id) {
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new com.smartlogix.ms_pedidos.exception.ResourceNotFoundException("Pedido no encontrado con ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pedido> listarPorCliente(Long clienteId) {
+        return pedidoRepository.findByClienteId(clienteId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pedido> listarPorEstado(EstadoPedido estado) {
+        return pedidoRepository.findByEstado(estado);
+    }
 }
