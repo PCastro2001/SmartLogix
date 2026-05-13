@@ -73,6 +73,15 @@ const ajustarStock = async (id, cantidad) => {
   }
 };
 
+const getBajoStock = async () => {
+  try {
+    const response = await axios.get(`${baseURL}/productos/bajo-stock`, defaultOptions);
+    return response.data;
+  } catch (error) {
+    normalizeError(error);
+  }
+};
+
 module.exports = {
   getProductos,
   getProductoById,
@@ -80,4 +89,5 @@ module.exports = {
   updateProducto,
   deleteProducto,
   ajustarStock,
+  getBajoStock,
 };

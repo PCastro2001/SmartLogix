@@ -27,10 +27,14 @@ describe('API Router - BFF Facade', () => {
   // ✅ TEST 3 — GET /api/dashboard agrega datos de ambos servicios
   test('GET /api/dashboard retorna inventario y pedidos', async () => {
     inventarioProxy.getProductos.mockResolvedValue([{ id: 1 }]);
+    inventarioProxy.getBajoStock.mockResolvedValue([]);
     pedidosProxy.getPedidos.mockResolvedValue([{ id: 1 }]);
+    pedidosProxy.getPedidosPorEstado.mockResolvedValue([]);
+    
     const res = await request(app).get('/api/dashboard');
-    expect(res.body).toHaveProperty('productos');
-    expect(res.body).toHaveProperty('pedidos');
+    expect(res.body).toHaveProperty('totalProductos');
+    expect(res.body).toHaveProperty('totalPedidos');
+    expect(res.body.parcial).toBe(false);
   });
 
   // ❌ TEST 4 — Fallo esperado: ms-inventario caído retorna 502 Bad Gateway
@@ -40,11 +44,15 @@ describe('API Router - BFF Facade', () => {
     expect(res.statusCode).toBe(502);
   });
 
-  // ❌ TEST 5 — Fallo esperado: dashboard con un servicio caído retorna error parcial controlado
-  test('GET /api/dashboard con ms-pedidos caído retorna 207 o error controlado', async () => {
+  // ❌ TEST 5 — Fallo esperado: dashboard con un servicio caído retorna parcial:true
+  test('GET /api/dashboard con ms-pedidos caído retorna parcial true', async () => {
     inventarioProxy.getProductos.mockResolvedValue([]);
+    inventarioProxy.getBajoStock.mockResolvedValue([]);
     pedidosProxy.getPedidos.mockRejectedValue({ status: 503 });
+    pedidosProxy.getPedidosPorEstado.mockResolvedValue([]);
+    
     const res = await request(app).get('/api/dashboard');
-    expect([200, 207, 502]).toContain(res.statusCode);
+    expect(res.body.parcial).toBe(true);
+    expect(res.statusCode).toBe(200); // Promise.allSettled no falla el request global
   });
 });

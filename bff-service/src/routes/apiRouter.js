@@ -110,21 +110,31 @@ router.delete('/pedidos/:id', async (req, res, next) => {
   }
 });
 
-// Dashboard Facade
+// Dashboard Facade enriquecido
 router.get('/dashboard', async (req, res, next) => {
-  try {
-    const [productos, pedidos] = await Promise.all([
-      inventarioProxy.getProductos(),
-      pedidosProxy.getPedidos()
-    ]);
-    res.json({ productos, pedidos });
-  } catch (error) {
-    // Para el dashboard, si falla uno, retornamos 207 o 502 según el test
-    res.status(207).json({ 
-      error: 'Error al obtener datos parciales', 
-      detalle: error.message 
-    });
-  }
+  const results = await Promise.allSettled([
+    inventarioProxy.getProductos(),
+    inventarioProxy.getBajoStock(),
+    pedidosProxy.getPedidos(),
+    pedidosProxy.getPedidosPorEstado('PENDIENTE')
+  ]);
+
+  const dashboard = {
+    totalProductos: results[0].status === 'fulfilled' ? (results[0].value?.length || 0) : 0,
+    productosBajoStock: results[1].status === 'fulfilled' ? (results[1].value?.length || 0) : 0,
+    totalPedidos: results[2].status === 'fulfilled' ? (results[2].value?.length || 0) : 0,
+    pedidosPendientes: results[3].status === 'fulfilled' ? (results[3].value?.length || 0) : 0,
+    parcial: results.some(r => r.status === 'rejected')
+  };
+
+  res.json(dashboard);
+});
+
+// Ruta para testear el errorHandler
+router.get('/test-error', (req, res, next) => {
+  const error = new Error('Error de prueba');
+  error.status = 418; // I'm a teapot
+  next(error);
 });
 
 module.exports = router;
