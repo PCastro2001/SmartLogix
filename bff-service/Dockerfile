@@ -11,6 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
-EXPOSE 8081
-ENV PORT=8081
-CMD ["node", "dist/main"]
+COPY src/index.js ./src/index.js
+EXPOSE 8080
+ENV PORT=8080
+CMD ["node", "src/index.js"]
