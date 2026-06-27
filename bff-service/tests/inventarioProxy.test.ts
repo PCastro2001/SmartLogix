@@ -99,4 +99,24 @@ describe('InventarioProxy', () => {
     jest.spyOn(httpService, 'get').mockReturnValue(throwError(() => error));
     await expect(proxy.getProductos()).rejects.toMatchObject({ status: 503 });
   });
+
+  test('circuit breaker se abre tras multiples fallas y retorna 503', async () => {
+    const error = new Error('Server Error');
+    jest.spyOn(httpService, 'get').mockReturnValue(throwError(() => error));
+
+    // Ejecutamos varias llamadas fallidas para abrir el breaker
+    for (let i = 0; i < 15; i++) {
+      try {
+        await proxy.getProductos();
+      } catch (e) {
+        // Ignoramos el error para seguir fallando
+      }
+    }
+
+    // La siguiente llamada debe fallar directamente por el breaker abierto (fail fast)
+    await expect(proxy.getProductos()).rejects.toMatchObject({
+      status: 503,
+      message: 'Circuit breaker abierto. El servicio no está disponible temporalmente.',
+    });
+  });
 });
